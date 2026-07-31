@@ -14,6 +14,7 @@ type ThemeProviderProps = {
 type ThemeProviderState = {
   theme: Theme
   setTheme: (theme: Theme) => void
+  toggleTheme: () => void
 }
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
@@ -58,25 +59,6 @@ function disableTransitionsTemporarily() {
   }
 }
 
-function isEditableTarget(target: EventTarget | null) {
-  if (!(target instanceof HTMLElement)) {
-    return false
-  }
-
-  if (target.isContentEditable) {
-    return true
-  }
-
-  const editableParent = target.closest(
-    "input, textarea, select, [contenteditable='true']"
-  )
-  if (editableParent) {
-    return true
-  }
-
-  return false
-}
-
 export function ThemeProvider({
   children,
   defaultTheme = "system",
@@ -100,6 +82,22 @@ export function ThemeProvider({
     },
     [storageKey]
   )
+
+  const toggleTheme = React.useCallback(() => {
+    setThemeState((currentTheme) => {
+      const nextTheme =
+        currentTheme === "dark"
+          ? "light"
+          : currentTheme === "light"
+            ? "dark"
+            : getSystemTheme() === "dark"
+              ? "light"
+              : "dark"
+
+      localStorage.setItem(storageKey, nextTheme)
+      return nextTheme
+    })
+  }, [storageKey])
 
   const applyTheme = React.useCallback(
     (nextTheme: Theme) => {
@@ -140,46 +138,6 @@ export function ThemeProvider({
   }, [theme, applyTheme])
 
   React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat) {
-        return
-      }
-
-      if (event.metaKey || event.ctrlKey || event.altKey) {
-        return
-      }
-
-      if (isEditableTarget(event.target)) {
-        return
-      }
-
-      if (event.key.toLowerCase() !== "d") {
-        return
-      }
-
-      setThemeState((currentTheme) => {
-        const nextTheme =
-          currentTheme === "dark"
-            ? "light"
-            : currentTheme === "light"
-              ? "dark"
-              : getSystemTheme() === "dark"
-                ? "light"
-                : "dark"
-
-        localStorage.setItem(storageKey, nextTheme)
-        return nextTheme
-      })
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-    }
-  }, [storageKey])
-
-  React.useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
       if (event.storageArea !== localStorage) {
         return
@@ -208,8 +166,9 @@ export function ThemeProvider({
     () => ({
       theme,
       setTheme,
+      toggleTheme,
     }),
-    [theme, setTheme]
+    [theme, setTheme, toggleTheme]
   )
 
   return (

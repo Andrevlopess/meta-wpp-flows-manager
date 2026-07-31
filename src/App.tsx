@@ -1,20 +1,44 @@
-import { Button } from "@/components/ui/button"
+import * as React from "react"
+import { Navigate, Route, Routes } from "react-router"
+
+import { AppShell } from "@/components/app-shell"
+import { Spinner } from "@/components/ui/spinner"
+import { FlowsListPage } from "@/pages/flows-list-page"
+import { NotFoundPage } from "@/pages/not-found-page"
+
+// Lazy-loaded at the route level (not just its editor): this page imports
+// monaco-setup.ts directly for model/marker management, not only through the
+// JsonEditor component, so route-level splitting is what actually keeps
+// Monaco out of the flows-list bundle.
+const FlowDetailPage = React.lazy(() =>
+  import("@/pages/flow-detail-page").then((m) => ({
+    default: m.FlowDetailPage,
+  }))
+)
 
 export function App() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
-    </div>
+    <AppShell>
+      <Routes>
+        <Route path="/" element={<Navigate to="/flows" replace />} />
+        <Route path="/flows" element={<FlowsListPage />} />
+        <Route
+          path="/flows/:flowId"
+          element={
+            <React.Suspense
+              fallback={
+                <div className="flex flex-1 items-center justify-center p-6">
+                  <Spinner className="size-6" />
+                </div>
+              }
+            >
+              <FlowDetailPage />
+            </React.Suspense>
+          }
+        />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </AppShell>
   )
 }
 

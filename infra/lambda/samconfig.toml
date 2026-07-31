@@ -1,0 +1,10 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "flows-manager-json-proxy"
+resolve_s3 = true
+s3_prefix = "flows-manager-json-proxy"
+region = "sa-east-1"
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "AllowedAssetHosts=\"mmg.whatsapp.net\""
+image_repositories = []

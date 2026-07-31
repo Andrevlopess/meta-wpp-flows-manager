@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Flow-asset proxy - fetches WhatsApp flow JSON from Meta's CDN server-side,
+  since that CDN inconsistently sends Access-Control-Allow-Origin per object.
+  Exposes the Lambda in infra/lambda/flow-asset-proxy behind an HTTP API.
+
+Parameters:
+  AllowedAssetHosts:
+    Type: String
+    Default: mmg.whatsapp.net
+    Description: >
+      Comma-separated CDN hostnames the proxy is allowed to fetch from
+      (also matches subdomains, e.g. "mmg.whatsapp.net" allows
+      "foo.mmg.whatsapp.net"). Passed to the Lambda as ALLOWED_ASSET_HOSTS.
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Timeout: 10
+    MemorySize: 128
+
+Resources:
+  FlowAssetProxyHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+
+  FlowAssetProxyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: flow-asset-proxy/
+      Handler: index.handler
+      Environment:
+        Variables:
+          ALLOWED_ASSET_HOSTS: !Ref AllowedAssetHosts
+      Events:
+        GetFlowAsset:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref FlowAssetProxyHttpApi
+            Path: /api/flow-asset
+            Method: get
+
+Outputs:
+  FlowAssetProxyApiUrl:
+    Description: >
+      Invoke URL for the flow-asset proxy. Point a CloudFront behavior for
+      /api/flow-asset* at this (custom origin), or set VITE_ASSET_PROXY_BASE
+      to it directly for local dev.
+    Value: !Sub "https://${FlowAssetProxyHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  FlowAssetProxyFunctionArn:
+    Description: Lambda function ARN.
+    Value: !GetAtt FlowAssetProxyFunction.Arn
