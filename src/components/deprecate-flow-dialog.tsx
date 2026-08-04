@@ -14,25 +14,28 @@ import {
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "@/components/ui/toast"
-import { useDeleteFlow } from "@/hooks/use-flow-mutations"
+import { useDeprecateFlow } from "@/hooks/use-flow-mutations"
+import { FLOW_STATUSES, type FlowStatus } from "@/lib/flows/types"
 
-export function DeleteFlowDialog({
+export function DeprecateFlowDialog({
   open,
   onOpenChange,
   flowId,
   flowName,
-  onDeleted,
+  flowStatus,
+  onDeprecated,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   flowId: string
   flowName: string
-  onDeleted?: () => void
+  flowStatus: FlowStatus
+  onDeprecated?: () => void
 }) {
   const navigate = useNavigate()
   const [confirmText, setConfirmText] = React.useState("")
 
-  const mutation = useDeleteFlow()
+  const mutation = useDeprecateFlow()
 
   // Reset local state when the dialog transitions to closed. Adjusting state
   // during render (rather than in an effect) avoids an extra render pass.
@@ -45,22 +48,26 @@ export function DeleteFlowDialog({
     }
   }
 
-  const canDelete = confirmText.trim() === flowName
+  const isDraft = flowStatus === FLOW_STATUSES.DRAFT
+  const canDeprecate = confirmText.trim() === flowName
 
   const handleConfirm = async () => {
-    if (!canDelete) return
+    if (!canDeprecate) return
 
     try {
-      await mutation.mutateAsync(flowId)
-      toast.add({ title: "Flow deleted", type: "success" })
+      const outcome = await mutation.mutateAsync({ flowId, status: flowStatus })
+      toast.add({
+        title: outcome === "deleted" ? "Flow deleted" : "Flow deprecated",
+        type: "success",
+      })
       onOpenChange(false)
-      onDeleted?.()
+      onDeprecated?.()
       navigate("/flows")
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       onOpenChange(false)
       toast.add({
-        title: "Could not delete flow",
+        title: "Could not deprecate flow",
         description: message,
         type: "error",
       })
@@ -71,10 +78,11 @@ export function DeleteFlowDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete &quot;{flowName}&quot;?</AlertDialogTitle>
+          <AlertDialogTitle>Deprecate &quot;{flowName}&quot;?</AlertDialogTitle>
           <AlertDialogDescription>
-            This deprecates and permanently deletes the flow. This cannot be
-            undone. Type the flow name to confirm.
+            {isDraft
+              ? "This flow was never published, so it is deleted outright. This cannot be undone. Type the flow name to confirm."
+              : "This flow has been published, so it can only be deprecated, not deleted. Deprecated flows stop being usable and cannot be restored. Type the flow name to confirm."}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -89,11 +97,11 @@ export function DeleteFlowDialog({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
-            disabled={!canDelete || mutation.isPending}
+            disabled={!canDeprecate || mutation.isPending}
             onClick={handleConfirm}
           >
             {mutation.isPending && <Spinner />}
-            Delete
+            {isDraft ? "Delete" : "Deprecate"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

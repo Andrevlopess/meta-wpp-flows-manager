@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useNavigate } from "react-router"
 import {
   EyeIcon,
   EyeOffIcon,
@@ -53,6 +54,7 @@ export function ProfileDialog({
   } = useProfiles()
   const [form, setForm] = React.useState<FormState | null>(null)
   const [showKey, setShowKey] = React.useState(false)
+  const navigate = useNavigate()
 
   const [prevOpen, setPrevOpen] = React.useState(open)
   if (open !== prevOpen) {
@@ -147,7 +149,10 @@ export function ProfileDialog({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setActiveProfileId(profile.id)}
+                        onClick={() => {
+                          setActiveProfileId(profile.id)
+                          navigate("/flows")
+                        }}
                       >
                         Use
                       </Button>
@@ -191,7 +196,7 @@ export function ProfileDialog({
                 autoFocus
                 value={form.label}
                 onChange={(e) => setForm({ ...form, label: e.target.value })}
-                placeholder="e.g. vitru, cyrela-prod"
+                placeholder="e.g. skeps, cliente-1, cliente-2..."
                 required
               />
             </Field>
@@ -236,7 +241,7 @@ export function ProfileDialog({
                 </Button>
               </div>
               <FieldDescription>
-                Sent as &quot;Authorization: Key …&quot; on every request.
+                Router Key of a router in meta WABA. e.g: Key ....
               </FieldDescription>
             </Field>
 

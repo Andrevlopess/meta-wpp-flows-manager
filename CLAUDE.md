@@ -59,14 +59,18 @@ network failures and non-2xx/`reason`-bearing responses into `LimeError`.
 
 [src/lib/flows/api.ts](src/lib/flows/api.ts) builds on top of this with one function per Blip
 operation (`listFlows`, `getFlow`, `getFlowAsset`, `createFlow`,
-`updateFlowJson`, `publishFlow`, `deleteFlow`, `updateFlowMetadata`). Response
+`updateFlowJson`, `publishFlow`, `deprecateFlow`, `updateFlowMetadata`). Response
 shapes coming back from Blip are inconsistent/undocumented in places, so this
 file leans on defensive unwrapping helpers (`unwrapList`,
 `findValidationErrorsArray`, `looksLikeFlowJson`) that walk the payload
 looking for the shape they need rather than assuming one fixed schema.
 
-`deleteFlow` intentionally swallows a failed "deprecate" call before deleting
-— a never-published draft has nothing to deprecate.
+`deprecateFlow` is the only removal path exposed in the UI: a flow that has
+been published even once can only be deprecated (Meta refuses to delete it),
+while a never-published draft has nothing to deprecate and can only be
+deleted. It branches on the flow's `status` and falls back to the other call
+if the first one fails, since Blip's reported status isn't always in sync
+with Meta's.
 
 ### Flow asset proxy
 

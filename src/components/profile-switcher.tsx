@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useNavigate } from "react-router"
 import { SettingsIcon } from "lucide-react"
 
 import {
@@ -17,6 +18,7 @@ const MANAGE_VALUE = "__manage__"
 export function ProfileSwitcher() {
   const { profiles, activeProfileId, setActiveProfileId } = useProfiles()
   const [dialogOpen, setDialogOpen] = React.useState(false)
+  const navigate = useNavigate()
 
   return (
     <>
@@ -31,6 +33,7 @@ export function ProfileSwitcher() {
             return
           }
           setActiveProfileId(value)
+          navigate("/flows")
         }}
       >
         <SelectTrigger className="w-48" size="sm">

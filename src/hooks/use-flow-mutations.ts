@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import {
   createFlow,
-  deleteFlow,
+  deprecateFlow,
   publishFlow,
   updateFlowJson,
   updateFlowMetadata,
@@ -12,6 +12,7 @@ import type {
   CreateFlowInput,
   FlowDetail,
   FlowJson,
+  FlowStatus,
   UpdateMetadataInput,
 } from "@/lib/flows/types"
 import { useRequestContext } from "@/context/profile-context"
@@ -89,13 +90,14 @@ export function useUpdateFlowMetadata(flowId: string) {
   })
 }
 
-export function useDeleteFlow() {
+export function useDeprecateFlow() {
   const ctx = useRequestContext()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (flowId: string) => deleteFlow(ctx, flowId),
-    onSuccess: (_data, flowId) => {
+    mutationFn: ({ flowId, status }: { flowId: string; status: FlowStatus }) =>
+      deprecateFlow(ctx, flowId, status),
+    onSuccess: (_outcome, { flowId }) => {
       queryClient.removeQueries({ queryKey: flowsKeys.flow(ctx, flowId) })
       void queryClient.invalidateQueries({ queryKey: flowsKeys.lists(ctx) })
     },

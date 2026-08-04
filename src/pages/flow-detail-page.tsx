@@ -2,10 +2,11 @@ import * as React from "react"
 import { Link, useNavigate, useParams } from "react-router"
 import type * as Monaco from "monaco-editor/editor/editor.api"
 import {
+  ArchiveXIcon,
   ArrowLeftIcon,
   PanelRightCloseIcon,
   PanelRightOpenIcon,
-  TrashIcon,
+  PencilIcon,
   UploadCloudIcon,
 } from "lucide-react"
 
@@ -21,9 +22,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "@/components/ui/toast"
-import { DeleteFlowDialog } from "@/components/delete-flow-dialog"
+import { DeprecateFlowDialog } from "@/components/deprecate-flow-dialog"
+import { EditFlowMetadataDialog } from "@/components/edit-flow-metadata-dialog"
 import { ErrorState } from "@/components/error-state"
-import { FlowMetadataForm } from "@/components/flow-metadata-form"
 import { FlowPreviewPanel } from "@/components/flow-preview-panel"
 import { FlowStatusBadge } from "@/components/flow-status-badge"
 import { ValidationErrorsPanel } from "@/components/validation-errors-panel"
@@ -72,7 +73,8 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
   >([])
   const [schemaEnabled, setSchemaEnabled] = React.useState(true)
   const [previewCollapsed, setPreviewCollapsed] = React.useState(true)
-  const [deleteOpen, setDeleteOpen] = React.useState(false)
+  const [deprecateOpen, setDeprecateOpen] = React.useState(false)
+  const [metadataEditOpen, setMetadataEditOpen] = React.useState(false)
   const [updateDialogOpen, setUpdateDialogOpen] = React.useState(false)
   const [updateResult, setUpdateResult] =
     React.useState<UpdateFlowJsonResult | null>(null)
@@ -316,7 +318,7 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
         : undefined
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col">
+    <div className="flex min-h-0 w-full flex-1 flex-col">
       <div className="flex items-center gap-3 px-4 py-2">
         <Button
           variant="ghost"
@@ -333,6 +335,14 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
             {detail.id}
           </span>
         </div>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Edit flow metadata"
+          onClick={() => setMetadataEditOpen(true)}
+        >
+          <PencilIcon />
+        </Button>
         <FlowStatusBadge status={detail.status} />
 
         <div className="ml-auto flex items-center gap-2">
@@ -359,10 +369,11 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="Delete flow"
-            onClick={() => setDeleteOpen(true)}
+            aria-label="Deprecate flow"
+            disabled={detail.status === FLOW_STATUSES.DEPRECATED}
+            onClick={() => setDeprecateOpen(true)}
           >
-            <TrashIcon />
+            <ArchiveXIcon />
           </Button>
           {previewCollapsed ? (
             <Button
@@ -384,10 +395,6 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
             </Button>
           )}
         </div>
-      </div>
-
-      <div className="border-b border-border p-3">
-        <FlowMetadataForm detail={detail} />
       </div>
 
       {data?.flowJsonError && !data.flowJson && (
@@ -437,12 +444,19 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
         </div>
       )}
 
-      <DeleteFlowDialog
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
+      <DeprecateFlowDialog
+        open={deprecateOpen}
+        onOpenChange={setDeprecateOpen}
         flowId={detail.id}
         flowName={detail.name}
-        onDeleted={() => navigate("/flows")}
+        flowStatus={detail.status}
+        onDeprecated={() => navigate("/flows")}
+      />
+
+      <EditFlowMetadataDialog
+        open={metadataEditOpen}
+        onOpenChange={setMetadataEditOpen}
+        detail={detail}
       />
 
       <Dialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpenState}>

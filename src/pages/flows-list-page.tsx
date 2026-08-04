@@ -1,6 +1,11 @@
 import * as React from "react"
 import { Link } from "react-router"
-import { CopyIcon, MoreHorizontalIcon, PlusIcon, TrashIcon } from "lucide-react"
+import {
+  ArchiveXIcon,
+  CopyIcon,
+  MoreHorizontalIcon,
+  PlusIcon,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -18,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { DeleteFlowDialog } from "@/components/delete-flow-dialog"
+import { DeprecateFlowDialog } from "@/components/deprecate-flow-dialog"
 import { EmptyState } from "@/components/empty-state"
 import { ErrorState } from "@/components/error-state"
 import { FlowStatusBadge } from "@/components/flow-status-badge"
@@ -26,7 +31,7 @@ import { NewFlowDialog } from "@/components/new-flow-dialog"
 import { ProfileDialog } from "@/components/profile-dialog"
 import { useFlows } from "@/hooks/use-flows"
 import { useProfiles } from "@/context/profile-context"
-import type { FlowSummary } from "@/lib/flows/types"
+import { FLOW_STATUSES, type FlowSummary } from "@/lib/flows/types"
 
 export function FlowsListPage() {
   const { activeProfile } = useProfiles()
@@ -58,9 +63,8 @@ export function FlowsListPage() {
 function FlowsListContent() {
   const { data, isPending, isError, error, refetch } = useFlows()
   const [newFlowOpen, setNewFlowOpen] = React.useState(false)
-  const [deleteTarget, setDeleteTarget] = React.useState<FlowSummary | null>(
-    null
-  )
+  const [deprecateTarget, setDeprecateTarget] =
+    React.useState<FlowSummary | null>(null)
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 p-6">
@@ -148,10 +152,11 @@ function FlowsListContent() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         variant="destructive"
-                        onClick={() => setDeleteTarget(flow)}
+                        disabled={flow.status === FLOW_STATUSES.DEPRECATED}
+                        onClick={() => setDeprecateTarget(flow)}
                       >
-                        <TrashIcon data-icon="inline-start" />
-                        Delete
+                        <ArchiveXIcon data-icon="inline-start" />
+                        Deprecate
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -164,14 +169,15 @@ function FlowsListContent() {
 
       <NewFlowDialog open={newFlowOpen} onOpenChange={setNewFlowOpen} />
 
-      {deleteTarget && (
-        <DeleteFlowDialog
-          open={!!deleteTarget}
+      {deprecateTarget && (
+        <DeprecateFlowDialog
+          open={!!deprecateTarget}
           onOpenChange={(open) => {
-            if (!open) setDeleteTarget(null)
+            if (!open) setDeprecateTarget(null)
           }}
-          flowId={deleteTarget.id}
-          flowName={deleteTarget.name}
+          flowId={deprecateTarget.id}
+          flowName={deprecateTarget.name}
+          flowStatus={deprecateTarget.status}
         />
       )}
     </div>
