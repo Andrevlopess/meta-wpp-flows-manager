@@ -57,7 +57,7 @@ export function DeprecateFlowDialog({
     try {
       const outcome = await mutation.mutateAsync({ flowId, status: flowStatus })
       toast.add({
-        title: outcome === "deleted" ? "Flow deleted" : "Flow deprecated",
+        title: outcome === "deleted" ? "Flow excluído" : "Flow descontinuado",
         type: "success",
       })
       onOpenChange(false)
@@ -67,7 +67,7 @@ export function DeprecateFlowDialog({
       const message = err instanceof Error ? err.message : String(err)
       onOpenChange(false)
       toast.add({
-        title: "Could not deprecate flow",
+        title: "Não foi possível descontinuar o flow",
         description: message,
         type: "error",
       })
@@ -78,11 +78,13 @@ export function DeprecateFlowDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Deprecate &quot;{flowName}&quot;?</AlertDialogTitle>
+          <AlertDialogTitle>
+            Descontinuar &quot;{flowName}&quot;?
+          </AlertDialogTitle>
           <AlertDialogDescription>
             {isDraft
-              ? "This flow was never published, so it is deleted outright. This cannot be undone. Type the flow name to confirm."
-              : "This flow has been published, so it can only be deprecated, not deleted. Deprecated flows stop being usable and cannot be restored. Type the flow name to confirm."}
+              ? "Este flow nunca foi publicado, portanto será excluído definitivamente. Essa ação não pode ser desfeita. Digite o nome do flow para confirmar."
+              : "Este flow já foi publicado, portanto só pode ser descontinuado, não excluído. Flows descontinuados deixam de ficar disponíveis e não podem ser restaurados. Digite o nome do flow para confirmar."}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -94,14 +96,14 @@ export function DeprecateFlowDialog({
         />
 
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
             disabled={!canDeprecate || mutation.isPending}
             onClick={handleConfirm}
           >
             {mutation.isPending && <Spinner />}
-            {isDraft ? "Delete" : "Deprecate"}
+            {isDraft ? "Excluir" : "Descontinuar"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

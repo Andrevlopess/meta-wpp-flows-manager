@@ -11,4 +11,6 @@ export const flowsKeys = {
     [...flowsKeys.flow(ctx, flowId), "asset"] as const,
   preview: (ctx: RequestContext, flowId: string) =>
     [...flowsKeys.flow(ctx, flowId), "preview"] as const,
+  publicKey: (ctx: RequestContext) =>
+    [...flowsKeys.all(ctx), "public-key"] as const,
 }

@@ -12,7 +12,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex w-full items-center justify-between">
           <Link to="/flows" className="flex items-center gap-2 font-medium">
             <FormIcon className="size-5 text-primary" />
-            <span>Flows Manager</span>
+            <span>Gerenciador de Flows</span>
           </Link>
           <div className="flex items-center gap-2">
             <ThemeToggle />

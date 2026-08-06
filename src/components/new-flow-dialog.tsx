@@ -61,14 +61,14 @@ export function NewFlowDialog({
         categories,
         endpoint_uri: endpoint.trim() || undefined,
       })
-      toast.add({ title: "Flow created", type: "success" })
+      toast.add({ title: "Flow criado", type: "success" })
       onOpenChange(false)
       navigate(`/flows/${id}`)
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       onOpenChange(false)
       toast.add({
-        title: "Could not create flow",
+        title: "Não foi possível criar o flow",
         description: message,
         type: "error",
       })
@@ -79,27 +79,27 @@ export function NewFlowDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>New flow</DialogTitle>
+          <DialogTitle>Novo flow</DialogTitle>
           <DialogDescription>
-            Creates an empty draft flow. You can edit its JSON afterwards.
+            Cria um flow de rascunho vazio. Você pode editar o JSON depois.
           </DialogDescription>
         </DialogHeader>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Field>
-            <FieldLabel htmlFor="new-flow-name">Name</FieldLabel>
+            <FieldLabel htmlFor="new-flow-name">Nome</FieldLabel>
             <Input
               id="new-flow-name"
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. personal-data-staging"
+              placeholder="ex.: personal-data-staging"
               required
             />
           </Field>
 
           <Field>
-            <FieldLabel>Categories</FieldLabel>
+            <FieldLabel>Categorias</FieldLabel>
             <div className="grid grid-cols-2 gap-2">
               {FLOW_CATEGORIES.map((category) => (
                 <label
@@ -118,7 +118,7 @@ export function NewFlowDialog({
 
           <Field>
             <FieldLabel htmlFor="new-flow-endpoint">
-              Endpoint URI (optional)
+              Endpoint URI (opcional)
             </FieldLabel>
             <Input
               id="new-flow-endpoint"
@@ -127,7 +127,7 @@ export function NewFlowDialog({
               placeholder="https://example.com/data"
             />
             <FieldDescription>
-              Required only for flows with a data endpoint.
+              Obrigatório apenas para flows com endpoint de dados.
             </FieldDescription>
           </Field>
 
@@ -137,7 +137,7 @@ export function NewFlowDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
               type="submit"
@@ -146,7 +146,7 @@ export function NewFlowDialog({
               }
             >
               {mutation.isPending && <Spinner />}
-              Create
+              Criar
             </Button>
           </DialogFooter>
         </form>

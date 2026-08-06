@@ -6,6 +6,7 @@ import {
   publishFlow,
   updateFlowJson,
   updateFlowMetadata,
+  uploadFlowPublicKey,
 } from "@/lib/flows/api"
 import { flowsKeys } from "@/lib/flows/query-keys"
 import type {
@@ -86,6 +87,20 @@ export function useUpdateFlowMetadata(flowId: string) {
           }
       )
       void queryClient.invalidateQueries({ queryKey: flowsKeys.lists(ctx) })
+    },
+  })
+}
+
+export function useUploadFlowPublicKey() {
+  const ctx = useRequestContext()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (publicKey: string) => uploadFlowPublicKey(ctx, publicKey),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: flowsKeys.publicKey(ctx),
+      })
     },
   })
 }

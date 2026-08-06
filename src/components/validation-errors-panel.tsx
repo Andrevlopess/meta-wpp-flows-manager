@@ -25,7 +25,7 @@ export function ValidationErrorsPanel({
     return (
       <div className="flex items-center gap-2 p-3 text-sm text-muted-foreground">
         <CheckCircle2Icon className="size-4 text-primary" />
-        No problems detected.
+        Nenhum problema detectado.
       </div>
     )
   }
@@ -71,7 +71,7 @@ export function ValidationErrorsPanel({
       )}
       {remainingCount > 0 && (
         <div className="px-2 py-1 text-xs text-muted-foreground">
-          +{remainingCount} more problem{remainingCount === 1 ? "" : "s"}
+          +{remainingCount} {remainingCount === 1 ? "problema" : "problemas"}
         </div>
       )}
     </div>

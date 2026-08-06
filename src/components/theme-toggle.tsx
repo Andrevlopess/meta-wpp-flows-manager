@@ -13,7 +13,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon-sm"
       aria-label={
-        resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"
+        resolvedTheme === "dark" ? "Mudar para tema claro" : "Mudar para tema escuro"
       }
       onClick={toggleTheme}
     >

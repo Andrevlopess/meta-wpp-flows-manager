@@ -22,7 +22,7 @@ export function EditorToolbar({
 }: EditorToolbarProps) {
   const handleCopy = () => {
     void navigator.clipboard.writeText(getValue())
-    toast.add({ title: "Copied JSON to clipboard", type: "success" })
+    toast.add({ title: "JSON copiado para a área de transferência", type: "success" })
   }
 
   const handleDownload = () => {
@@ -39,11 +39,11 @@ export function EditorToolbar({
     <div className="flex items-center gap-1 border-b border-border px-2 py-1.5">
       <Button variant="ghost" size="sm" onClick={handleCopy}>
         <CopyIcon data-icon="inline-start" />
-        Copy
+        Copiar
       </Button>
       <Button variant="ghost" size="sm" onClick={handleDownload}>
         <DownloadIcon data-icon="inline-start" />
-        Download
+        Baixar
       </Button>
 
       <Separator orientation="vertical" className="mx-1 h-5" />
@@ -54,13 +54,13 @@ export function EditorToolbar({
         onClick={() => onSchemaEnabledChange(!schemaEnabled)}
       >
         <SparklesIcon data-icon="inline-start" />
-        Schema validation: {schemaEnabled ? "on" : "off"}
+        Validação de json: {schemaEnabled ? "ativada" : "desativada"}
       </Button>
 
       <div className="ml-auto flex items-center gap-2">
         {markerCount > 0 && (
           <Badge variant="destructive">
-            {markerCount} problem{markerCount === 1 ? "" : "s"}
+            {markerCount} {markerCount === 1 ? "problema" : "problemas"}
           </Badge>
         )}
       </div>

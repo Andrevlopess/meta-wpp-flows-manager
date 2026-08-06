@@ -115,11 +115,12 @@ export function ProfileDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Router key profiles</DialogTitle>
+          <DialogTitle>Perfis de chave de roteamento</DialogTitle>
           <DialogDescription>
-            Each profile stores a Blip contract and router key, used for every
-            request. Stored in plaintext in this browser&apos;s local storage —
-            this is a developer tool, not a secrets manager.
+            Cada perfil armazena um contrato Blip e uma chave de roteamento,
+            usados em todas as requisições. Armazenados em texto simples no
+            armazenamento local deste navegador — esta é uma ferramenta de
+            desenvolvedor, não um gerenciador de segredos.
           </DialogDescription>
         </DialogHeader>
 
@@ -128,7 +129,7 @@ export function ProfileDialog({
             <div className="flex max-h-[min(60vh,24rem)] flex-col gap-1 overflow-y-auto">
               {profiles.length === 0 && (
                 <p className="py-2 text-sm text-muted-foreground">
-                  No profiles yet.
+                  Nenhum perfil ainda.
                 </p>
               )}
               {profiles.map((profile) => (
@@ -154,13 +155,13 @@ export function ProfileDialog({
                           navigate("/flows")
                         }}
                       >
-                        Use
+                        Usar
                       </Button>
                     )}
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      aria-label={`Edit ${profile.label}`}
+                      aria-label={`Editar ${profile.label}`}
                       onClick={() => startEdit(profile)}
                     >
                       <PencilIcon />
@@ -168,7 +169,7 @@ export function ProfileDialog({
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      aria-label={`Delete ${profile.label}`}
+                      aria-label={`Excluir ${profile.label}`}
                       onClick={() => handleDelete(profile.id)}
                     >
                       <TrashIcon />
@@ -182,7 +183,7 @@ export function ProfileDialog({
 
             <Button variant="outline" onClick={startCreate}>
               <PlusIcon data-icon="inline-start" />
-              Add profile
+              Adicionar perfil
             </Button>
           </div>
         )}
@@ -190,19 +191,19 @@ export function ProfileDialog({
         {form && (
           <form className="flex flex-col gap-4" onSubmit={saveForm}>
             <Field>
-              <FieldLabel htmlFor="profile-label">Label</FieldLabel>
+              <FieldLabel htmlFor="profile-label">Rótulo</FieldLabel>
               <Input
                 id="profile-label"
                 autoFocus
                 value={form.label}
                 onChange={(e) => setForm({ ...form, label: e.target.value })}
-                placeholder="e.g. skeps, cliente-1, cliente-2..."
+                placeholder="ex.: skeps, cliente-1, cliente-2..."
                 required
               />
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="profile-contract">Contract</FieldLabel>
+              <FieldLabel htmlFor="profile-contract">Contrato</FieldLabel>
               <Input
                 id="profile-contract"
                 value={form.contract}
@@ -211,12 +212,14 @@ export function ProfileDialog({
                 required
               />
               <FieldDescription>
-                Subdomain of http.msging.net, e.g. &quot;wlck&quot;.
+                Subdomínio de http.msging.net, ex.: &quot;wlck&quot;.
               </FieldDescription>
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="profile-router-key">Router key</FieldLabel>
+              <FieldLabel htmlFor="profile-router-key">
+                Chave de roteamento
+              </FieldLabel>
               <div className="relative">
                 <Input
                   id="profile-router-key"
@@ -234,22 +237,22 @@ export function ProfileDialog({
                   variant="ghost"
                   size="icon-sm"
                   className="absolute top-1/2 right-1 -translate-y-1/2"
-                  aria-label={showKey ? "Hide router key" : "Show router key"}
+                  aria-label={showKey ? "Ocultar chave de roteamento" : "Mostrar chave de roteamento"}
                   onClick={() => setShowKey((v) => !v)}
                 >
                   {showKey ? <EyeOffIcon /> : <EyeIcon />}
                 </Button>
               </div>
               <FieldDescription>
-                Router Key of a router in meta WABA. e.g: Key ....
+                Chave de roteamento de um roteador na WABA da Meta. ex.: Key ....
               </FieldDescription>
             </Field>
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={cancelForm}>
-                Cancel
+                Cancelar
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit">Salvar</Button>
             </DialogFooter>
           </form>
         )}

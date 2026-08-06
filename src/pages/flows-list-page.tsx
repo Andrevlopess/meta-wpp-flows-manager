@@ -3,6 +3,7 @@ import { Link } from "react-router"
 import {
   ArchiveXIcon,
   CopyIcon,
+  KeyRoundIcon,
   MoreHorizontalIcon,
   PlusIcon,
 } from "lucide-react"
@@ -23,13 +24,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { toast } from "@/components/ui/toast"
 import { DeprecateFlowDialog } from "@/components/deprecate-flow-dialog"
 import { EmptyState } from "@/components/empty-state"
 import { ErrorState } from "@/components/error-state"
 import { FlowStatusBadge } from "@/components/flow-status-badge"
 import { NewFlowDialog } from "@/components/new-flow-dialog"
 import { ProfileDialog } from "@/components/profile-dialog"
+import { PublicKeyDialog } from "@/components/public-key-dialog"
 import { useFlows } from "@/hooks/use-flows"
+import { useFlowPublicKey } from "@/hooks/use-flow-public-key"
 import { useProfiles } from "@/context/profile-context"
 import { FLOW_STATUSES, type FlowSummary } from "@/lib/flows/types"
 
@@ -41,11 +45,11 @@ export function FlowsListPage() {
     return (
       <div className="flex flex-1 items-center justify-center p-6">
         <EmptyState
-          title="No profile configured"
-          description="Add a router key profile to start listing flows."
+          title="Nenhum perfil configurado"
+          description="Adicione um perfil de chave de roteamento para começar a listar flows."
           action={
             <Button onClick={() => setProfileDialogOpen(true)}>
-              Add profile
+              Adicionar perfil
             </Button>
           }
         />
@@ -62,18 +66,41 @@ export function FlowsListPage() {
 
 function FlowsListContent() {
   const { data, isPending, isError, error, refetch } = useFlows()
+  const { data: publicKey, isPending: isKeyPending } = useFlowPublicKey()
   const [newFlowOpen, setNewFlowOpen] = React.useState(false)
+  const [publicKeyOpen, setPublicKeyOpen] = React.useState(false)
   const [deprecateTarget, setDeprecateTarget] =
     React.useState<FlowSummary | null>(null)
+
+  const handleCopy = (value: string, label: string) => {
+    void navigator.clipboard.writeText(value)
+    toast.add({ title: `${label} copiado para a área de transferência`, type: "success" })
+  }
+
+  const hasPublicKey = typeof publicKey === "string" && publicKey.length > 0
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-medium">Flows</h1>
-        <Button onClick={() => setNewFlowOpen(true)}>
-          <PlusIcon data-icon="inline-start" />
-          New flow
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            disabled={isKeyPending}
+            onClick={() => setPublicKeyOpen(true)}
+          >
+            {hasPublicKey ? (
+              <KeyRoundIcon data-icon="inline-start" />
+            ) : (
+              <PlusIcon data-icon="inline-start" />
+            )}
+            {hasPublicKey ? "Editar chave pública" : "Chave pública"}
+          </Button>
+          <Button onClick={() => setNewFlowOpen(true)}>
+            <PlusIcon data-icon="inline-start" />
+            Novo flow
+          </Button>
+        </div>
       </div>
 
       {isPending && <ListSkeleton />}
@@ -82,12 +109,12 @@ function FlowsListContent() {
 
       {data && data.length === 0 && (
         <EmptyState
-          title="No flows found"
-          description="Create your first flow to get started."
+          title="Nenhum flow encontrado"
+          description="Crie seu primeiro flow para começar."
           action={
             <Button onClick={() => setNewFlowOpen(true)}>
               <PlusIcon data-icon="inline-start" />
-              New flow
+              Novo flow
             </Button>
           }
         />
@@ -97,9 +124,9 @@ function FlowsListContent() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
+              <TableHead>Nome</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Categories</TableHead>
+              <TableHead>Categorias</TableHead>
               <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
@@ -107,14 +134,44 @@ function FlowsListContent() {
             {data.map((flow) => (
               <TableRow key={flow.id}>
                 <TableCell>
-                  <Link
-                    to={`/flows/${flow.id}`}
-                    className="font-medium hover:underline"
-                  >
-                    {flow.name}
-                  </Link>
-                  <div className="font-mono text-xs text-muted-foreground">
-                    {flow.id}
+                  <div className="group/name flex items-center gap-1">
+                    <Link
+                      to={`/flows/${flow.id}`}
+                      className="font-medium hover:underline"
+                    >
+                      {flow.name}
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label="Copiar nome do flow"
+                      className="opacity-0 group-hover/name:opacity-100 focus-visible:opacity-100"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleCopy(flow.name, "Nome do flow")
+                      }}
+                    >
+                      <CopyIcon />
+                    </Button>
+                  </div>
+                  <div className="group/id flex items-center gap-1">
+                    <div className="font-mono text-xs text-muted-foreground">
+                      {flow.id}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label="Copiar ID do flow"
+                      className="opacity-0 group-hover/id:opacity-100 focus-visible:opacity-100"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleCopy(flow.id, "ID do flow")
+                      }}
+                    >
+                      <CopyIcon />
+                    </Button>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -130,7 +187,7 @@ function FlowsListContent() {
                         <Button
                           variant="ghost"
                           size="icon-sm"
-                          aria-label="Row actions"
+                          aria-label="Ações da linha"
                         />
                       }
                     >
@@ -140,7 +197,7 @@ function FlowsListContent() {
                       <DropdownMenuItem
                         render={<Link to={`/flows/${flow.id}`} />}
                       >
-                        Open
+                        Abrir
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
@@ -148,7 +205,7 @@ function FlowsListContent() {
                         }}
                       >
                         <CopyIcon data-icon="inline-start" />
-                        Copy ID
+                        Copiar ID
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         variant="destructive"
@@ -156,7 +213,7 @@ function FlowsListContent() {
                         onClick={() => setDeprecateTarget(flow)}
                       >
                         <ArchiveXIcon data-icon="inline-start" />
-                        Deprecate
+                        Descontinuar
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -168,6 +225,8 @@ function FlowsListContent() {
       )}
 
       <NewFlowDialog open={newFlowOpen} onOpenChange={setNewFlowOpen} />
+
+      <PublicKeyDialog open={publicKeyOpen} onOpenChange={setPublicKeyOpen} />
 
       {deprecateTarget && (
         <DeprecateFlowDialog

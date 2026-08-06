@@ -20,11 +20,11 @@ export function FlowDetailLayout() {
     return (
       <div className="flex flex-1 items-center justify-center p-6">
         <EmptyState
-          title="No profile configured"
-          description="Add a router key profile to start listing flows."
+          title="Nenhum perfil configurado"
+          description="Adicione um perfil de chave de roteamento para começar a listar flows."
           action={
             <Button onClick={() => setProfileDialogOpen(true)}>
-              Add profile
+              Adicionar perfil
             </Button>
           }
         />
@@ -51,7 +51,7 @@ function FlowDetailLayoutContent() {
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="New flow"
+            aria-label="Novo flow"
             onClick={() => setNewFlowOpen(true)}
           >
             <PlusIcon />
@@ -67,7 +67,7 @@ function FlowDetailLayoutContent() {
 
           {data && data.length === 0 && (
             <p className="px-2 py-4 text-xs text-muted-foreground">
-              No flows found.
+              Nenhum flow encontrado.
             </p>
           )}
 

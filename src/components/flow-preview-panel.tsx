@@ -23,7 +23,7 @@ export function FlowPreviewPanel({
     return (
       <div className="flex flex-1 items-center justify-center gap-2 p-6 text-sm text-muted-foreground">
         <Spinner />
-        Detecting preview…
+        Detectando prévia…
       </div>
     )
   }
@@ -31,15 +31,15 @@ export function FlowPreviewPanel({
   if (!outcome || outcome.kind === "unsupported") {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
-        <p className="text-sm font-medium">Preview unavailable</p>
+        <p className="text-sm font-medium">Prévia indisponível</p>
         <p className="max-w-xs text-sm text-muted-foreground">
-          Blip&apos;s command proxy did not return a preview_url for any known
-          request shape.
+          O proxy de comandos do Blip não retornou um preview_url para nenhuma
+          forma de requisição conhecida.
         </p>
         {outcome && outcome.attempts.length > 0 && (
           <details className="w-full max-w-xs text-left text-xs text-muted-foreground">
             <summary className="cursor-pointer select-none">
-              Attempts ({outcome.attempts.length})
+              Tentativas ({outcome.attempts.length})
             </summary>
             <ul className="mt-1 flex flex-col gap-1">
               {outcome.attempts.map((attempt) => (
@@ -63,7 +63,7 @@ export function FlowPreviewPanel({
         >
           {isLoading && <Spinner />}
           <RefreshCwIcon data-icon="inline-start" />
-          Retry detection
+          Tentar detecção novamente
         </Button>
       </div>
     )
@@ -74,7 +74,7 @@ export function FlowPreviewPanel({
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-1.5">
-        <span className="text-xs text-muted-foreground">Preview</span>
+        <span className="text-xs text-muted-foreground">Prévia</span>
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -83,12 +83,12 @@ export function FlowPreviewPanel({
             render={<a href={preview.url} target="_blank" rel="noreferrer" />}
           >
             <ExternalLinkIcon data-icon="inline-start" />
-            Open in new tab
+            Abrir em nova aba
           </Button>
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="Refresh preview"
+            aria-label="Atualizar prévia"
             onClick={() => void refresh()}
             disabled={isLoading}
           >
@@ -115,16 +115,18 @@ function PreviewFrame({ url }: { url: string }) {
     <div className="relative flex-1 bg-muted/30">
       <iframe
         src={url}
-        title="Flow preview"
+        title="Prévia do flow"
         className="size-full border-0"
         onLoad={() => setLoaded(true)}
       />
       {timedOut && !loaded && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/95 p-6 text-center">
-          <p className="text-sm font-medium">Preview could not be embedded</p>
+          <p className="text-sm font-medium">
+            Não foi possível incorporar a prévia
+          </p>
           <p className="max-w-xs text-sm text-muted-foreground">
-            The preview may refuse to load inside an iframe. Open it in a new
-            tab instead.
+            A prévia pode se recusar a carregar dentro de um iframe. Abra-a em
+            uma nova aba.
           </p>
           <Button
             variant="outline"
@@ -133,7 +135,7 @@ function PreviewFrame({ url }: { url: string }) {
             render={<a href={url} target="_blank" rel="noreferrer" />}
           >
             <ExternalLinkIcon data-icon="inline-start" />
-            Open in new tab
+            Abrir em nova aba
           </Button>
         </div>
       )}

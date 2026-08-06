@@ -37,9 +37,9 @@ export function ProfileSwitcher() {
         }}
       >
         <SelectTrigger className="w-48" size="sm">
-          <SelectValue placeholder="No profile">
+          <SelectValue placeholder="Nenhum perfil">
             {(value: string | null) =>
-              profiles.find((p) => p.id === value)?.label ?? "No profile"
+              profiles.find((p) => p.id === value)?.label ?? "Nenhum perfil"
             }
           </SelectValue>
         </SelectTrigger>
@@ -52,7 +52,7 @@ export function ProfileSwitcher() {
           {profiles.length > 0 && <SelectSeparator />}
           <SelectItem value={MANAGE_VALUE}>
             <SettingsIcon />
-            Manage profiles…
+            Gerenciar perfis…
           </SelectItem>
         </SelectContent>
       </Select>

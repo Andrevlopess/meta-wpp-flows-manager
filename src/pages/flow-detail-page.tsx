@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router"
 import type * as Monaco from "monaco-editor/editor/editor.api"
 import {
   ArchiveXIcon,
-  ArrowLeftIcon,
+  ChevronLeft,
   PanelRightCloseIcon,
   PanelRightOpenIcon,
   PencilIcon,
@@ -211,8 +211,8 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
       // mid-request).
       if (!updateDialogOpenRef.current) {
         toast.add({
-          title: "Update failed",
-          description: "Editor is not ready yet.",
+          title: "Falha na atualização",
+          description: "O editor ainda não está pronto.",
           type: "error",
         })
       }
@@ -232,7 +232,7 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
         setUpdateOk(true)
         setMetaErrors([])
         if (!updateDialogOpenRef.current) {
-          toast.add({ title: "Flow JSON updated", type: "success" })
+          toast.add({ title: "JSON do flow atualizado", type: "success" })
         }
       } else {
         setUpdateOk(false)
@@ -240,7 +240,7 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
         applyMetaMarkers(monaco, model, result.validationErrors)
         if (!updateDialogOpenRef.current) {
           toast.add({
-            title: `Update failed — ${result.validationErrors.length} validation error(s)`,
+            title: `Falha na atualização — ${result.validationErrors.length} erro(s) de validação`,
             type: "error",
           })
         }
@@ -250,7 +250,7 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
       if (!updateDialogOpenRef.current) {
         const message = err instanceof Error ? err.message : String(err)
         toast.add({
-          title: "Update failed",
+          title: "Falha na atualização",
           description: message,
           type: "error",
         })
@@ -265,11 +265,11 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
       // whatever's open (the update dialog, if publishing from its footer) and
       // surface the result via toast instead.
       setUpdateDialogOpenState(false)
-      toast.add({ title: "Flow published", type: "success" })
+      toast.add({ title: "Flow publicado", type: "success" })
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       toast.add({
-        title: "Publish failed",
+        title: "Falha ao publicar",
         description: message,
         type: "error",
       })
@@ -304,17 +304,17 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
   // Update/Publish stay enabled unconditionally — these are advisory hints
   // surfaced as tooltips, not gates.
   const updateWarning = hasSyntaxErrors
-    ? "Fix JSON syntax errors first."
+    ? "Corrija os erros de sintaxe do JSON primeiro."
     : !dirty
-      ? "No changes to update."
+      ? "Nenhuma alteração para atualizar."
       : undefined
 
   const publishWarning = isPublished
-    ? "Flow is already published."
+    ? "O flow já está publicado."
     : dirty
-      ? "You have unsaved changes — run Update first."
+      ? "Você tem alterações não salvas — execute Atualizar primeiro."
       : !updateOk || metaErrors.length > 0
-        ? "Run Update successfully first."
+        ? "Execute Atualizar com sucesso primeiro."
         : undefined
 
   return (
@@ -323,11 +323,11 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label="Back to flows"
+          aria-label="Voltar para flows"
           nativeButton={false}
           render={<Link to="/flows" />}
         >
-          <ArrowLeftIcon />
+          <ChevronLeft/>
         </Button>
         <div className="flex min-w-0 flex-col">
           <span className="truncate text-sm font-medium">{detail.name}</span>
@@ -338,7 +338,7 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label="Edit flow metadata"
+          aria-label="Editar metadados do flow"
           onClick={() => setMetadataEditOpen(true)}
         >
           <PencilIcon />
@@ -356,7 +356,7 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
             }}
           >
             {updateMutation.isPending && <Spinner />}
-            Update
+            Atualizar
           </Button>
           <Button size="sm" title={publishWarning} onClick={handlePublish}>
             {publishMutation.isPending ? (
@@ -364,12 +364,12 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
             ) : (
               <UploadCloudIcon data-icon="inline-start" />
             )}
-            Publish
+            Publicar
           </Button>
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="Deprecate flow"
+            aria-label="Descontinuar flow"
             disabled={detail.status === FLOW_STATUSES.DEPRECATED}
             onClick={() => setDeprecateOpen(true)}
           >
@@ -382,13 +382,13 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
               onClick={() => setPreviewCollapsed(false)}
             >
               <PanelRightOpenIcon data-icon="inline-start" />
-              View preview
+              Ver prévia
             </Button>
           ) : (
             <Button
               variant="ghost"
               size="icon-sm"
-              aria-label="Hide preview"
+              aria-label="Ocultar prévia"
               onClick={() => setPreviewCollapsed(true)}
             >
               <PanelRightCloseIcon />
@@ -464,12 +464,12 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
           <DialogHeader>
             <DialogTitle>
               {updateMutation.isPending
-                ? "Updating flow…"
+                ? "Atualizando flow…"
                 : updateMutation.status === "error"
-                  ? "Update failed"
+                  ? "Falha na atualização"
                   : updateResult?.ok
-                    ? "Flow JSON updated"
-                    : "Update rejected"}
+                    ? "JSON do flow atualizado"
+                    : "Atualização rejeitada"}
             </DialogTitle>
             {!updateMutation.isPending && updateMutation.status === "error" && (
               <DialogDescription>
@@ -478,14 +478,15 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
             )}
             {!updateMutation.isPending && updateResult?.ok && (
               <DialogDescription>
-                The flow JSON was updated successfully. You can publish it now.
+                O JSON do flow foi atualizado com sucesso. Você já pode
+                publicá-lo.
               </DialogDescription>
             )}
             {!updateMutation.isPending && updateResult && !updateResult.ok && (
               <DialogDescription>
-                Meta rejected the update with{" "}
-                {updateResult.validationErrors.length} validation error(s). Fix
-                them and try again.
+                A Meta rejeitou a atualização com{" "}
+                {updateResult.validationErrors.length} erro(s) de validação.
+                Corrija-os e tente novamente.
               </DialogDescription>
             )}
           </DialogHeader>
@@ -493,7 +494,7 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
           {updateMutation.isPending && (
             <div className="flex items-center justify-center gap-2 p-6 text-sm text-muted-foreground">
               <Spinner />
-              Updating flow…
+              Atualizando flow…
             </div>
           )}
 
@@ -516,7 +517,7 @@ function FlowDetailContent({ flowId }: { flowId: string }) {
                 ) : (
                   <UploadCloudIcon data-icon="inline-start" />
                 )}
-                Publish
+                Publicar
               </Button>
             </DialogFooter>
           )}

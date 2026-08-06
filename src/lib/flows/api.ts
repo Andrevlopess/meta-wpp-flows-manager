@@ -4,6 +4,7 @@ import {
   sendCommand,
   sendCommandOrThrow,
 } from "@/lib/lime/client"
+import type { LimeResponse } from "@/lib/lime/types"
 import { FLOW_STATUSES } from "./types"
 import type {
   CreateFlowInput,
@@ -90,26 +91,94 @@ async function fetchFlowJsonAsset(url: string): Promise<FlowJson> {
     response = await fetch(proxiedUrl)
   } catch (err) {
     throw new LimeError(
-      `Could not reach the asset proxy. Open the asset manually: ${url}`,
+      `Não foi possível acessar o proxy de assets. Abra o asset manualmente: ${url}`,
       { raw: err }
     )
   }
 
   if (!response.ok) {
     throw new LimeError(
-      `Could not download the flow JSON asset (HTTP ${response.status}). Open it manually: ${url}`,
+      `Não foi possível baixar o asset JSON do flow (HTTP ${response.status}). Abra-o manualmente: ${url}`,
       { httpStatus: response.status }
     )
   }
 
   const parsed: unknown = await response.json()
   if (!looksLikeFlowJson(parsed)) {
-    throw new LimeError("Downloaded asset does not look like Flow JSON.", {
+    throw new LimeError("O asset baixado não parece ser um JSON de flow.", {
       raw: parsed,
     })
   }
 
   return parsed
+}
+
+const PUBLIC_KEY_URI = "/whatsapp-flows/public-key/upload"
+
+function extractPublicKey(resource: unknown): string | null {
+  if (typeof resource === "string" && resource.trim()) {
+    return resource
+  }
+
+  if (typeof resource === "object" && resource !== null) {
+    const obj = resource as Record<string, unknown>
+
+    for (const key of ["business_public_key", "public_key"]) {
+      const value = obj[key]
+      if (typeof value === "string" && value.trim()) {
+        return value
+      }
+    }
+
+    if (Array.isArray(obj.data)) {
+      for (const item of obj.data) {
+        if (typeof item !== "object" || item === null) {
+          continue
+        }
+        for (const key of ["business_public_key", "public_key"]) {
+          const value = (item as Record<string, unknown>)[key]
+          if (typeof value === "string" && value.trim()) {
+            return value
+          }
+        }
+      }
+    }
+  }
+
+  return null
+}
+
+export async function getFlowPublicKey(
+  ctx: RequestContext
+): Promise<string | null> {
+  let response: LimeResponse<unknown>
+  try {
+    response = await sendCommand<unknown>(
+      { method: "get", uri: PUBLIC_KEY_URI },
+      ctx
+    )
+  } catch {
+    // No key (or an unreachable command) must not crash the flows list — the
+    // absence is what decides the button label and the dialog that opens.
+    return null
+  }
+
+  return extractPublicKey(response.resource)
+}
+
+export async function uploadFlowPublicKey(
+  ctx: RequestContext,
+  publicKey: string
+): Promise<void> {
+  await sendCommandOrThrow<void>(
+    {
+      method: "set",
+      uri: PUBLIC_KEY_URI,
+      type: "application/json",
+      resource: { business_public_key: publicKey },
+    },
+    ctx
+  )
 }
 
 export async function listFlows(ctx: RequestContext): Promise<FlowSummary[]> {
@@ -179,7 +248,7 @@ export async function getFlowAsset(
     }
   }
 
-  throw new LimeError("Unrecognised flow asset response shape.", {
+  throw new LimeError("Formato de resposta de asset de flow não reconhecido.", {
     raw: resource,
   })
 }
@@ -208,7 +277,7 @@ export async function createFlow(
   )
 
   if (!result?.id) {
-    throw new LimeError("Flow was created but no id was returned.", {
+    throw new LimeError("O flow foi criado, mas nenhum id foi retornado.", {
       raw: result,
     })
   }

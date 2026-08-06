@@ -59,7 +59,7 @@ export async function sendCommand<TRes = unknown, TReq = unknown>(
       throw err
     }
     throw new LimeError(
-      "Request blocked by the browser (likely CORS) or the network is unreachable. Check the browser console for details.",
+      "Requisição bloqueada pelo navegador (provavelmente CORS) ou a rede está inacessível. Verifique o console do navegador para obter detalhes.",
       { raw: err }
     )
   }
@@ -69,7 +69,7 @@ export async function sendCommand<TRes = unknown, TReq = unknown>(
     body = await response.json()
   } catch (err) {
     throw new LimeError(
-      `Unexpected non-JSON response from Blip (HTTP ${response.status}).`,
+      `Resposta não-JSON inesperada do Blip (HTTP ${response.status}).`,
       { httpStatus: response.status, raw: err }
     )
   }
@@ -77,7 +77,7 @@ export async function sendCommand<TRes = unknown, TReq = unknown>(
   if (!response.ok) {
     const reason = extractReason(body)
     throw new LimeError(
-      reason?.description ?? `Request failed (HTTP ${response.status}).`,
+      reason?.description ?? `Requisição falhou (HTTP ${response.status}).`,
       {
         code: reason?.code,
         httpStatus: response.status,
@@ -103,7 +103,7 @@ export async function sendCommandOrThrow<TRes = unknown, TReq = unknown>(
     return undefined as TRes
   }
 
-  const description = response.reason?.description ?? "Unknown error"
+  const description = response.reason?.description ?? "Erro desconhecido"
   throw new LimeError(description, {
     code: response.reason?.code,
     raw: response,

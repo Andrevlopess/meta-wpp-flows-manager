@@ -115,7 +115,7 @@ async function tryStrategy(
       extractPreview(response.resource) ?? extractPreview(response)
 
     if (!preview) {
-      return { error: "Response did not contain a preview_url." }
+      return { error: "A resposta não continha um preview_url." }
     }
 
     return { preview }

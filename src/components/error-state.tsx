@@ -27,13 +27,13 @@ export function ErrorState({ error, onRetry, className }: ErrorStateProps) {
         </p>
         {code !== undefined && (
           <p className="font-mono text-xs wrap-break-word text-muted-foreground">
-            code: {code}
+            código: {code}
           </p>
         )}
       </div>
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>
-          Retry
+          Tentar novamente
         </Button>
       )}
     </div>

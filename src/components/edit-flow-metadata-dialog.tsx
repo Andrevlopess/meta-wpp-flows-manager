@@ -67,12 +67,12 @@ export function EditFlowMetadataDialog({
         endpoint_uri: endpoint.trim(),
         categories,
       })
-      toast.add({ title: "Metadata updated", type: "success" })
+      toast.add({ title: "Metadados atualizados", type: "success" })
       onOpenChange(false)
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       toast.add({
-        title: "Could not update metadata",
+        title: "Não foi possível atualizar os metadados",
         description: message,
         type: "error",
       })
@@ -83,15 +83,15 @@ export function EditFlowMetadataDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit flow metadata</DialogTitle>
+          <DialogTitle>Editar metadados do flow</DialogTitle>
           <DialogDescription>
-            Updates the flow&apos;s name, endpoint, and categories.
+            Atualiza o nome, o endpoint e as categorias do flow.
           </DialogDescription>
         </DialogHeader>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Field>
-            <FieldLabel htmlFor="metadata-name">Name</FieldLabel>
+            <FieldLabel htmlFor="metadata-name">Nome</FieldLabel>
             <Input
               id="metadata-name"
               autoFocus
@@ -112,7 +112,7 @@ export function EditFlowMetadataDialog({
           </Field>
 
           <Field>
-            <FieldLabel>Categories</FieldLabel>
+            <FieldLabel>Categorias</FieldLabel>
             <div className="grid grid-cols-2 gap-2">
               {FLOW_CATEGORIES.map((category) => (
                 <label
@@ -136,14 +136,14 @@ export function EditFlowMetadataDialog({
               onClick={() => onOpenChange(false)}
               disabled={mutation.isPending}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
               type="submit"
               disabled={mutation.isPending || !name.trim()}
             >
               {mutation.isPending && <Spinner />}
-              Save
+              Salvar
             </Button>
           </DialogFooter>
         </form>
