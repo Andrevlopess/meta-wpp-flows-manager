@@ -346,7 +346,7 @@ export async function deprecateFlow(
 ): Promise<DeprecateFlowOutcome> {
   const deprecate = () =>
     sendCommandOrThrow<void>(
-      { method: "delete", uri: `/whatsapp-flows/deprecate/${id}` },
+      { method: "get", uri: `/whatsapp-flows/deprecate/${id}` },
       ctx
     )
 
